@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración | Mensajes Anónimos</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Vista de Inicio de Sesión -->
+  <div id="loginView" class="login-card">
+    <h2>Administración</h2>
+    <p>Ingresa la contraseña para leer los mensajes.</p>
+    <form id="loginForm" class="login-form">
+      <input
+        type="password"
+        id="passwordInput"
+        class="login-input"
+        placeholder="Contraseña de administrador"
+        required
+        autocomplete="current-password"
+      />
+      <div id="loginError" class="login-error">Contraseña incorrecta</div>
+      <button type="submit" id="loginBtn" class="btn-primary">Ingresar</button>
+      <a href="index.html" class="admin-link" style="margin-top: 10px;">← Volver al chat</a>
+    </form>
+  </div>
+
+  <!-- Vista Principal del Administrador (Oculta hasta autenticar) -->
+  <main id="adminView" class="admin-container" style="display: none;">
+    <header class="admin-header">
+      <div class="admin-header-title">
+        <h1>Mensajes Recibidos</h1>
+        <span id="messagesCount" class="count-badge">0 mensajes</span>
+      </div>
+      <div class="admin-actions">
+        <button id="refreshBtn" class="btn-secondary" title="Actualizar lista">Actualizar</button>
+        <button id="logoutBtn" class="btn-secondary" title="Cerrar sesión">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <section id="messagesList" class="messages-list">
+      <div class="empty-state">Cargando mensajes...</div>
+    </section>
+  </main>
+
+  <!-- Notificación Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <span id="toastMessage">Operación realizada</span>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

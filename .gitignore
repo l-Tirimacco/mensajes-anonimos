@@ -1,0 +1,13 @@
+# Cloudflare / Wrangler
+.wrangler/
+.env*
+!.env.example
+
+# OS y temporales
+.DS_Store
+Thumbs.db
+*.log
+
+# Bases de datos locales si se prueban
+*.db
+*.sqlite
