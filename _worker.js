@@ -1,4 +1,34 @@
-// Cloudflare Worker con soporte de Assets estáticos y base de datos D1
+// Cloudflare Worker con soporte de Assets estáticos, base de datos D1 y autenticación
+
+// Función auxiliar para obtener la contraseña sin importar si es variable o Secrets Store
+async function resolveAdminPassword(env) {
+  // 1. Variables de entorno o Secrets de texto plano
+  if (typeof env.ADMIN_PASSWORD === 'string' && env.ADMIN_PASSWORD.trim()) {
+    return env.ADMIN_PASSWORD.trim();
+  }
+  if (typeof env.PASSWORD_KEY === 'string' && env.PASSWORD_KEY.trim()) {
+    return env.PASSWORD_KEY.trim();
+  }
+
+  // 2. Cloudflare Secrets Store (si se vinculó como almacén de secretos)
+  const stores = [env.ADMIN_PASSWORD, env.PASSWORD_KEY];
+  const secretKeys = ['ADMIN_PASSWORD', 'PASSWORD_KEY'];
+
+  for (const store of stores) {
+    if (store && typeof store.get === 'function') {
+      for (const key of secretKeys) {
+        try {
+          const val = await store.get(key);
+          if (val && typeof val === 'string' && val.trim()) {
+            return val.trim();
+          }
+        } catch (_) {}
+      }
+    }
+  }
+
+  return null;
+}
 
 export default {
   async fetch(request, env, ctx) {
@@ -59,7 +89,7 @@ export default {
         try {
           const authHeader = request.headers.get('Authorization') || '';
           const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-          const adminPassword = env.ADMIN_PASSWORD || env.PASSWORD_KEY;
+          const adminPassword = await resolveAdminPassword(env);
 
           if (!adminPassword || !token || token !== adminPassword) {
             return new Response(JSON.stringify({ error: 'No autorizado. Se requiere contraseña de administrador.' }), {
@@ -96,7 +126,7 @@ export default {
         try {
           const authHeader = request.headers.get('Authorization') || '';
           const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-          const adminPassword = env.ADMIN_PASSWORD || env.PASSWORD_KEY;
+          const adminPassword = await resolveAdminPassword(env);
 
           if (!adminPassword || !token || token !== adminPassword) {
             return new Response(JSON.stringify({ error: 'No autorizado.' }), {
@@ -144,11 +174,11 @@ export default {
       try {
         const data = await request.json().catch(() => ({}));
         const password = (data.password || '').trim();
-        const adminPassword = env.ADMIN_PASSWORD || env.PASSWORD_KEY;
+        const adminPassword = await resolveAdminPassword(env);
 
         if (!adminPassword) {
           return new Response(JSON.stringify({ 
-            error: 'Contraseña no configurada en las variables de entorno de Cloudflare (ADMIN_PASSWORD o PASSWORD_KEY).' 
+            error: 'Contraseña no encontrada en Cloudflare. Revisa que ADMIN_PASSWORD o PASSWORD_KEY esté configurada.' 
           }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
