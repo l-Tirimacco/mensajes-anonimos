@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Error al enviar el mensaje');
+        throw new Error(errorData.error || `Error (${response.status}): No se pudo procesar la solicitud`);
       }
 
       // Éxito: limpiar caja de texto y restablecer estado
