@@ -59,7 +59,7 @@ export default {
         try {
           const authHeader = request.headers.get('Authorization') || '';
           const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-          const adminPassword = env.ADMIN_PASSWORD;
+          const adminPassword = env.ADMIN_PASSWORD || env.PASSWORD_KEY;
 
           if (!adminPassword || !token || token !== adminPassword) {
             return new Response(JSON.stringify({ error: 'No autorizado. Se requiere contraseña de administrador.' }), {
@@ -96,7 +96,7 @@ export default {
         try {
           const authHeader = request.headers.get('Authorization') || '';
           const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-          const adminPassword = env.ADMIN_PASSWORD;
+          const adminPassword = env.ADMIN_PASSWORD || env.PASSWORD_KEY;
 
           if (!adminPassword || !token || token !== adminPassword) {
             return new Response(JSON.stringify({ error: 'No autorizado.' }), {
@@ -144,11 +144,11 @@ export default {
       try {
         const data = await request.json().catch(() => ({}));
         const password = (data.password || '').trim();
-        const adminPassword = env.ADMIN_PASSWORD;
+        const adminPassword = env.ADMIN_PASSWORD || env.PASSWORD_KEY;
 
         if (!adminPassword) {
           return new Response(JSON.stringify({ 
-            error: 'ADMIN_PASSWORD no configurada en las variables de entorno de Cloudflare.' 
+            error: 'Contraseña no configurada en las variables de entorno de Cloudflare (ADMIN_PASSWORD o PASSWORD_KEY).' 
           }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }

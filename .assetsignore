@@ -1,0 +1,9 @@
+_worker.js
+functions
+functions/**
+schema.sql
+README.md
+.gitignore
+.git
+wrangler.json
+.assetsignore
